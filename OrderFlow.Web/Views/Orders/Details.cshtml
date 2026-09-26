@@ -1,0 +1,175 @@
+@model OrderFlow.Web.Models.Order
+
+@{
+    ViewData["Title"] = "Order Details";
+}
+
+<div class="row justify-content-center">
+    <div class="col-lg-9">
+
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert alert-success">
+                @TempData["SuccessMessage"]
+            </div>
+        }
+
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="alert alert-danger">
+                @TempData["ErrorMessage"]
+            </div>
+        }
+
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h2>Order Details</h2>
+                <p class="text-muted">@Model.OrderNumber</p>
+            </div>
+
+            <span class="badge bg-warning text-dark fs-6">
+                @Model.Status
+            </span>
+        </div>
+
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-white">
+                <h5 class="mb-0">Customer Information</h5>
+            </div>
+
+            <div class="card-body">
+                <div class="row">
+
+                    <div class="col-md-6">
+                        <small class="text-muted">Customer Name</small>
+                        <p class="fw-semibold">@Model.CustomerName</p>
+                    </div>
+
+                    <div class="col-md-6">
+                        <small class="text-muted">Email</small>
+                        <p class="fw-semibold">@Model.CustomerEmail</p>
+                    </div>
+
+                    <div class="col-md-6">
+                        <small class="text-muted">Created</small>
+                        <p>
+                            @Model.CreatedAt.ToLocalTime().ToString("dd MMM yyyy hh:mm tt")
+                        </p>
+                    </div>
+
+                    <div class="col-md-6">
+                        <small class="text-muted">Status</small>
+                        <p>@Model.Status</p>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="card shadow-sm mb-4">
+
+            <div class="card-header bg-white">
+                <h5 class="mb-0">Order Items</h5>
+            </div>
+
+            <div class="card-body">
+
+                <table class="table align-middle">
+
+                    <thead class="table-light">
+                        <tr>
+                            <th>Product</th>
+                            <th>Unit Price</th>
+                            <th>Quantity</th>
+                            <th class="text-end">Total</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        @foreach (var item in Model.Items)
+                        {
+                            <tr>
+                                <td>
+                                    <strong>@item.ProductName</strong>
+                                </td>
+
+                                <td>
+                                    ₹@item.UnitPrice.ToString("N2")
+                                </td>
+
+                                <td>
+                                    @item.Quantity
+                                </td>
+
+                                <td class="text-end">
+                                    ₹@item.TotalPrice.ToString("N2")
+                                </td>
+                            </tr>
+                        }
+
+                    </tbody>
+
+                </table>
+
+                <hr />
+
+                <div class="text-end">
+                    <small class="text-muted">Order Total</small>
+
+                    <h3 class="text-primary">
+                        ₹@Model.TotalAmount.ToString("N2")
+                    </h3>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="d-flex gap-2">
+
+            @if (Model.Status == OrderFlow.Web.Models.OrderStatus.Pending)
+            {
+                <form asp-controller="Orders"
+                      asp-action="Process"
+                      asp-route-id="@Model.Id"
+                      method="post">
+
+                    <button type="submit"
+                            class="btn btn-success">
+                        Process Order
+                    </button>
+
+                </form>
+            }
+            @if (Model.Status == OrderFlow.Web.Models.OrderStatus.Pending)
+            {
+                <form asp-controller="Orders"
+                      asp-action="Cancel"
+                      asp-route-id="@Model.Id"
+                      method="post"
+                      onsubmit="return confirm('Are you sure you want to cancel this order?');">
+
+                    <button type="submit"
+                            class="btn btn-outline-danger">
+                        Cancel Order
+                    </button>
+
+                </form>
+            }
+
+            <a asp-controller="Orders"
+               asp-action="Create"
+               class="btn btn-primary">
+                Create Another Order
+            </a>
+
+            <a asp-controller="Products"
+               asp-action="Index"
+               class="btn btn-outline-secondary">
+                Products
+            </a>
+
+        </div>
+
+    </div>
+</div>

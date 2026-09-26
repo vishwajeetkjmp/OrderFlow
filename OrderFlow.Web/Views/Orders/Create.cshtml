@@ -1,0 +1,268 @@
+﻿@model OrderFlow.Web.ViewModels.CreateOrderViewModel
+
+@{
+    ViewData["Title"] = "Create Order";
+}
+
+<div class="row justify-content-center">
+    <div class="col-lg-9">
+
+        <div class="mb-4">
+            <h2>Create Order</h2>
+            <p class="text-muted">
+                Enter customer details and select a product to place an order.
+            </p>
+        </div>
+
+        <form asp-action="Create" method="post">
+
+            <div asp-validation-summary="ModelOnly"
+                 class="alert alert-danger">
+            </div>
+
+            <!-- Customer Information -->
+            <div class="card shadow-sm mb-4">
+
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">Customer Information</h5>
+                </div>
+
+                <div class="card-body">
+
+                    <div class="row">
+
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="CustomerName"
+                                   class="form-label">
+                                Customer Name
+                            </label>
+
+                            <input asp-for="CustomerName"
+                                   class="form-control"
+                                   placeholder="Enter customer name" />
+
+                            <span asp-validation-for="CustomerName"
+                                  class="text-danger">
+                            </span>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="CustomerEmail"
+                                   class="form-label">
+                                Email
+                            </label>
+
+                            <input asp-for="CustomerEmail"
+                                   class="form-control"
+                                   placeholder="customer@example.com" />
+
+                            <span asp-validation-for="CustomerEmail"
+                                  class="text-danger">
+                            </span>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- Order Item -->
+            <div class="card shadow-sm mb-4">
+
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">Order Item</h5>
+                </div>
+
+                <div class="card-body">
+
+                    <div class="row align-items-end">
+
+                        <div class="col-md-6 mb-3">
+
+                            <label class="form-label">
+                                Product
+                            </label>
+
+                            <select asp-for="Items[0].ProductId"
+                                    id="productSelect"
+                                    class="form-select">
+
+                                <option value="">
+                                    -- Select Product --
+                                </option>
+
+                                @foreach (var product in Model.AvailableProducts)
+                                {
+                                    <option value="@product.Id"
+                                            data-price="@product.Price"
+                                            data-stock="@product.AvailableStock">
+
+                                        @product.Name
+                                        - ₹@product.Price.ToString("N2")
+                                    </option>
+                                }
+
+                            </select>
+
+                            <span asp-validation-for="Items[0].ProductId"
+                                  class="text-danger">
+                            </span>
+
+                        </div>
+
+                        <div class="col-md-2 mb-3">
+
+                            <label class="form-label">
+                                Quantity
+                            </label>
+
+                            <input asp-for="Items[0].Quantity"
+                                   id="quantity"
+                                   type="number"
+                                   min="1"
+                                   class="form-control" />
+
+                        </div>
+
+                        <div class="col-md-2 mb-3">
+
+                            <label class="form-label">
+                                Available Stock
+                            </label>
+
+                            <input id="availableStock"
+                                   class="form-control"
+                                   readonly />
+
+                        </div>
+
+                        <div class="col-md-2 mb-3">
+
+                            <label class="form-label">
+                                Total
+                            </label>
+
+                            <input id="lineTotal"
+                                   class="form-control"
+                                   readonly />
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- Order Total -->
+            <div class="card shadow-sm mb-4">
+
+                <div class="card-body">
+
+                    <div class="d-flex justify-content-between align-items-center">
+
+                        <div>
+                            <span class="text-muted">
+                                Order Total
+                            </span>
+
+                            <h3 class="mb-0" id="orderTotal">
+                                ₹0.00
+                            </h3>
+                        </div>
+
+                        <button type="submit"
+                                class="btn btn-primary btn-lg">
+                            Place Order
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </form>
+
+    </div>
+</div>
+
+@section Scripts {
+
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+
+        const productSelect =
+            document.getElementById("productSelect");
+
+        const quantity =
+            document.getElementById("quantity");
+
+        const availableStock =
+            document.getElementById("availableStock");
+
+        const lineTotal =
+            document.getElementById("lineTotal");
+
+        const orderTotal =
+            document.getElementById("orderTotal");
+
+
+        function updateOrderDetails() {
+
+            const selectedOption =
+                productSelect.options[productSelect.selectedIndex];
+
+            if (!selectedOption || !selectedOption.value) {
+
+                availableStock.value = "";
+                lineTotal.value = "";
+                orderTotal.innerText = "₹0.00";
+
+                return;
+            }
+
+            const price =
+                parseFloat(selectedOption.dataset.price);
+
+            const stock =
+                parseInt(selectedOption.dataset.stock);
+
+            const qty =
+                parseInt(quantity.value) || 0;
+
+
+            availableStock.value = stock;
+
+            const total = price * qty;
+
+            lineTotal.value =
+                "₹" + total.toLocaleString("en-IN",
+                {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                });
+
+            orderTotal.innerText =
+                "₹" + total.toLocaleString("en-IN",
+                {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                });
+        }
+
+
+        productSelect.addEventListener(
+            "change",
+            updateOrderDetails);
+
+        quantity.addEventListener(
+            "input",
+            updateOrderDetails);
+
+        updateOrderDetails();
+
+    </script>
+}
