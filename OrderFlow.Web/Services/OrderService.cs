@@ -197,4 +197,38 @@ public class OrderService
 
         _dbContext.SaveChanges();
     }
+
+    public async Task CompleteOrderProcessingAsync(Guid orderId)
+{
+    var order = await _dbContext.Orders
+        .FirstOrDefaultAsync(x => x.Id == orderId);
+
+    if (order == null)
+    {
+        throw new InvalidOperationException(
+            $"Order {orderId} was not found.");
+    }
+
+    if (order.Status == OrderStatus.Completed)
+    {
+        return;
+    }
+
+    if (order.Status == OrderStatus.Cancelled)
+    {
+        throw new InvalidOperationException(
+            "Cancelled orders cannot be processed.");
+    }
+
+    order.Status = OrderStatus.Processing;
+
+    await _dbContext.SaveChangesAsync();
+
+    await Task.Delay(2000);
+
+    order.Status = OrderStatus.Completed;
+    order.ProcessedAt = DateTime.UtcNow;
+
+    await _dbContext.SaveChangesAsync();
+}
 }

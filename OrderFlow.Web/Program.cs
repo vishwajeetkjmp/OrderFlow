@@ -11,6 +11,7 @@ builder.Services.AddDbContext<OrderFlowDbContext>(options =>
 builder.Services.AddScoped<ProductService>();
 builder.Services.AddScoped<OrderService>();
 builder.Services.AddScoped<OrderMessageSender>();
+builder.Services.AddHostedService<OrderProcessingConsumer>();
 
 var app = builder.Build();
 
