@@ -1,6 +1,7 @@
 using OrderFlow.Web.Services;
 using Microsoft.EntityFrameworkCore;
 using OrderFlow.Web.Data;
+using OrderFlow.Web.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -38,40 +39,40 @@ app.MapControllerRoute(
 using (var scope = app.Services.CreateScope())
 {
     var dbContext = scope.ServiceProvider
-        .GetRequiredService<OrderFlow.Web.Data.OrderFlowDbContext>();
+        .GetRequiredService<OrderFlowDbContext>();
 
     if (!dbContext.Products.Any())
     {
         dbContext.Products.AddRange(
-            new OrderFlow.Web.Models.Product
+            new Product
             {
                 Name = "Laptop",
                 Description = "High-performance laptop",
                 Price = 75000,
                 AvailableStock = 10
             },
-            new OrderFlow.Web.Models.Product
+            new Product
             {
                 Name = "Smartphone",
                 Description = "5G smartphone",
                 Price = 45000,
                 AvailableStock = 15
             },
-            new OrderFlow.Web.Models.Product
+            new Product
             {
                 Name = "Headphones",
                 Description = "Wireless headphones",
                 Price = 5000,
                 AvailableStock = 25
             },
-            new OrderFlow.Web.Models.Product
+            new Product
             {
                 Name = "Monitor",
                 Description = "27-inch monitor",
                 Price = 25000,
                 AvailableStock = 8
             },
-            new OrderFlow.Web.Models.Product
+            new Product
             {
                 Name = "Keyboard",
                 Description = "Mechanical keyboard",
